@@ -5,7 +5,7 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
 Version:   1.0.16
-Release:   1.2%{?dist}
+Release:   3%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://libmemcached.org/
@@ -174,6 +174,12 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Jan 24 2014 Daniel Mach <dmach@redhat.com> - 1.0.16-3
+- Mass rebuild 2014-01-24
+
+* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 1.0.16-2
+- Mass rebuild 2013-12-27
+
 * Tue Apr 30 2013 Daniel Mach <dmach@redhat.com> - 1.0.16-1.2
 - Rebuild for cyrus-sasl
 
