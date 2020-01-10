@@ -5,7 +5,7 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
 Version:   1.0.16
-Release:   3%{?dist}
+Release:   5%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://libmemcached.org/
@@ -30,6 +30,7 @@ BuildRequires: systemtap-sdt-devel
 %endif
 BuildRequires: libevent-devel
 
+Patch0: libmemcached-fix-linking-with-libpthread.patch
 
 %description
 libmemcached is a C/C++ client library and tools for the memcached server
@@ -71,10 +72,13 @@ you will need to install %{name}-devel.
 
 %prep
 %setup -q
+%patch0 -p1 -b .pthread
 
 mkdir examples
 cp -p tests/*.{cc,h} examples/
 
+# Don't test memaslap: https://bugs.launchpad.net/libmemcached/+bug/1115357
+sed -i '/^TESTS = /s|\($(bin_PROGRAMS)\)|$(filter-out clients/memaslap,\1)|' Makefile.in
 
 %build
 # option --with-memcached=false to disable server binary check (as we don't run test)
@@ -118,15 +122,7 @@ fi
 
 %check
 %if %{runselftest}
-make test 2>&1 | tee rpmtests.log
-# Ignore test result for memaslap (XFAIL but PASS)
-# https://bugs.launchpad.net/libmemcached/+bug/1115357
-if grep "XPASS: clients/memaslap" rpmtests.log && grep "1 of 21" rpmtests.log
-then
-  exit 0
-else
-  exit 1
-fi
+make test
 %endif
 
 
@@ -174,6 +170,17 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Jul 27 2015 Scientific Linux Auto Patch Process <SCIENTIFIC-LINUX-DEVEL@LISTSERV.FNAL.GOV>
+- Eliminated rpmbuild "bogus date" error due to inconsistent weekday,
+  by assuming the date is correct and changing the weekday.
+
+* Thu Jul 02 2015 Miroslav Lichvar <mlichvar@redhat.com> - 1.0.16-5
+- don't test memaslap in make check (#1231828)
+- rebuild with fixed binutils (#1238466)
+
+* Wed Apr 22 2015 Miroslav Lichvar <mlichvar@redhat.com> - 1.0.16-4
+- fix linking with libpthread (#1116949)
+
 * Fri Jan 24 2014 Daniel Mach <dmach@redhat.com> - 1.0.16-3
 - Mass rebuild 2014-01-24
 
